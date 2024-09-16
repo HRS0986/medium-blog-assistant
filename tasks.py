@@ -24,7 +24,8 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
-            agent=agent
+            expected_output="Improved blog article in markdown format.",
+            agent=agent,
         )
 
     def prepare_introduction(self, agent: Agent, blog: str) -> Task:
@@ -42,6 +43,7 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
+            expected_output="Blog article with improved introduction in markdown format.",
             agent=agent
         )
 
@@ -61,6 +63,7 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
+            expected_output="Blog article with improved conclusion in markdown format.",
             agent=agent
         )
 
@@ -77,6 +80,7 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
+            expected_output="Blog article with corrected grammar and spelling mistakes in markdown format.",
             agent=agent
         )
 
@@ -92,10 +96,11 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
+            expected_output="An string contains subject area or areas of the blog post.",
             agent=agent
         )
 
-    def check_for_content_accuracy(self, agent: Agent, blog: str, subject: str) -> Task:
+    def check_for_content_accuracy(self, agent: Agent, blog: str, subject: Task) -> Task:
         return Task(
             description=dedent(
                 f"""
@@ -105,9 +110,10 @@ class MediumTasks:
                 Output should be the blog article with corrected content accuracy.
                 Parameters (parameter values are delimited in triple backticks):
                     - Blog (in markdown format): ```{blog}```
-                    - Subject Area: ```{subject}```
                 Notes: {self.__tip_section()}
                 """
             ),
+            context=[subject],
+            expected_output="Blog article with corrected content accuracy in markdown format.",
             agent=agent
         )
