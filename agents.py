@@ -34,6 +34,20 @@ class MediumAgents:
             llm=self.openai_gpt4o
         )
 
+    def markdown_converter_agent(self, verbose: bool = None) -> Agent:
+        return Agent(
+            role="Markdown Converter",
+            goal="Convert the medium blog article to markdown format",
+            backstory=dedent(
+                """
+                Expert in converting HTML or text content to markdown format. Knowledgeable in markdown syntax.
+                Many experience in converting various types of content to markdown format using suitable styles.
+                """
+            ),
+            verbose=verbose if verbose is not None else self.verbose,
+            llm=self.openai_gpt4o
+        )
+
     def conclusion_writer_agent(self, verbose: bool = None) -> Agent:
         return Agent(
             role="Conclusion Writer",

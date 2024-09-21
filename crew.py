@@ -32,19 +32,26 @@ class BlogCrew:
             [prepare_conclusion, prepare_introduction]
         )
 
+        markdown_conversion = self.tasks.convert_to_markdown(
+            self.agents.markdown_converter_agent(),
+            [check_grammar_and_spellings]
+        )
+
         crew = Crew(
             agents=[
                 self.agents.introduction_writer_agent(),
                 self.agents.conclusion_writer_agent(),
-                self.agents.grammar_checker_agent()
+                self.agents.grammar_checker_agent(),
+                self.agents.markdown_converter_agent()
             ],
             tasks=[
                 prepare_introduction,
                 prepare_conclusion,
                 check_grammar_and_spellings,
+                markdown_conversion
             ],
             verbose=self.verbose,
-            manager_llm=self.agents.openai_gpt4o,
+            # manager_llm=self.agents.openai_gpt4o,
             manager_agent=self.agents.expert_project_manager_agent(),
             process=Process.hierarchical
         )
