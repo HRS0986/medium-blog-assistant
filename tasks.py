@@ -1,9 +1,18 @@
 from crewai import Task, Agent
 from textwrap import dedent
+from crewai.tasks import TaskOutput
 
 
 class MediumTasks:
-    def __tip_section(self) -> str:
+
+    @staticmethod
+    def __task_callback(output: TaskOutput):
+        print("\n\nTask Completed")
+        print(f"Task: {output.description}")
+        print(f"Context: {output.raw}\n\n")
+
+    @staticmethod
+    def __tip_section() -> str:
         return dedent(
             """
             If you do your best work, you will be given a $10,000 commission.
@@ -11,40 +20,27 @@ class MediumTasks:
             """
         )
 
-    def make_better_blog_article(self, agent: Agent, blog: str) -> Task:
+    def prepare_introduction(self, agent: Agent, blog: str) -> Task:
         return Task(
             description=dedent(
                 f"""
-                Task: Make the medium blog article better.
-                Description: Study the given blog article. Improve the blog post in a creative way. Add more details,
-                correct any mistakes, and make the blog post more engaging. And make blog article crystal clear to the
-                audience. Output should be the blog article with improvements.
-                Parameters (parameter values are delimited in triple backticks):
-                    - Blog (in markdown format): ```{blog}```
-                Notes: {self.__tip_section()}
-                """
-            ),
-            expected_output="Improved blog article in markdown format.",
-            agent=agent,
-        )
-
-    def prepare_introduction(self, agent: Agent, blog: str) -> Task:
-        return Task(
-            decription=dedent(
-                f"""
                 Task: Write or rewrite the introduction/lead paragraph for the medium blog article.
-                Description: Study the given blog article. Check if the blog post already have an introduction.
-                If yes, read the introduction and improve that in more creative manner.
-                If it does not have an introduction, write a proper introduction in creative way. But don't be dramatic.
-                Write a natural one. It should more close to the writing style of the current blog post. Should not
-                change anything not related to introduction. Output should be the blog article with improved introduction.
+                Description: Study the given blog article. Check if the blog post already have an introduction. If yes,
+                read the introduction and check does it need any improvements. If it need some improvements, improve
+                that in more creative manner, but don't change the wring style and the core idea of it. If the existing
+                introduction does not need any improvement don't do anything to that. If it does not have an
+                introduction, write a proper introduction in creative way. But don't be dramatic. Write a natural one.
+                It should more close to the writing style of the current blog post. Should not change anything not
+                related to introduction. Output should be the blog article with improved introduction.
                 Parameters (parameter values are delimited in triple backticks):
                     - Blog (in markdown format): ```{blog}```
                 Notes: {self.__tip_section()}
                 """
             ),
             expected_output="Blog article with improved introduction in markdown format.",
-            agent=agent
+            agent=agent,
+            async_execution=True,
+            callback=self.__task_callback
         )
 
     def prepare_conclusion(self, agent: Agent, blog: str) -> Task:
@@ -53,7 +49,9 @@ class MediumTasks:
                 f"""
                 Task: Write or rewrite the conclusion for the medium blog article.
                 Description: Study the given blog article. Check if the blog post already have a conclusion. If yes
-                read the conclusion and improve that in more creative manner. If the conclusion contain unnecessary
+                read the conclusion and check does it need any improvements. If it need some improvements, improve
+                that in more creative manner, but don't change the wring style and the core idea of it. If the existing
+                conclusion does not need any improvement don't do anything to that. If the conclusion contain un wanted
                 information, remove them. Then add relevant details to the conclusion. If it does not have a conclusion,
                 write a proper conclusion in creative way. But don't be dramatic. Write a natural one. It should more
                 close to the writing style of the current blog post. Should not change anything not related to
@@ -64,10 +62,12 @@ class MediumTasks:
                 """
             ),
             expected_output="Blog article with improved conclusion in markdown format.",
-            agent=agent
+            agent=agent,
+            async_execution=True,
+            callback=self.__task_callback
         )
 
-    def check_grammar_and_spellings(self, agent: Agent, blog: str) -> Task:
+    def check_grammar_and_spellings(self, agent: Agent, blog_tasks: list[Task]) -> Task:
         return Task(
             description=dedent(
                 f"""
@@ -75,13 +75,13 @@ class MediumTasks:
                 Description: Study the given blog article. Check the grammar and spelling mistakes in the blog post.
                 Correct the mistakes and make the blog post error free. If there are no mistakes do nothing.
                 Output should be the blog article with corrected grammar and spelling mistakes.
-                Parameters (parameter values are delimited in triple backticks):
-                    - Blog (in markdown format): ```{blog}```
                 Notes: {self.__tip_section()}
                 """
             ),
             expected_output="Blog article with corrected grammar and spelling mistakes in markdown format.",
-            agent=agent
+            agent=agent,
+            context=blog_tasks,
+            callback=self.__task_callback
         )
 
     def analyze_for_subject_area(self, agent: Agent, blog: str) -> Task:
@@ -97,7 +97,8 @@ class MediumTasks:
                 """
             ),
             expected_output="An string contains subject area or areas of the blog post.",
-            agent=agent
+            agent=agent,
+            callback=self.__task_callback
         )
 
     def check_for_content_accuracy(self, agent: Agent, blog: str, subject: Task) -> Task:
@@ -113,7 +114,8 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
-            context=[subject],
             expected_output="Blog article with corrected content accuracy in markdown format.",
-            agent=agent
+            agent=agent,
+            context=[subject],
+            callback=self.__task_callback
         )

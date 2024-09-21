@@ -40,6 +40,6 @@ def medium_to_markdown(url):
     return markdown_content
 
 # Example usage
-url = "https://medium.com/@heshanhfernando/pii-masking-with-python-using-ai4privacy-12279bf7312a"
-result = medium_to_markdown(url)
-print(result)
+# url = "https://medium.com/@heshanhfernando/pii-masking-with-python-using-ai4privacy-12279bf7312a"
+# result = medium_to_markdown(url)
+# print(result)
