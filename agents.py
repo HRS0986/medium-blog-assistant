@@ -76,6 +76,21 @@ class MediumAgents:
             verbose=verbose if verbose is not None else self.verbose,
             llm=self.openai_gpt4o
         )
+        
+    def seo_specialist_agent(self, verbose: bool = None) -> Agent:
+        return Agent(
+            role="SEO Specialist",
+            goal="Generate SEO friendly title for the blog article",
+            backstory=dedent(
+                """
+                Expert in Search Engine Optimization (SEO) and keyword research.
+                Knowledgeable in optimizing content for search engines.
+                Many experience in improving search engine rankings.
+                """
+            ),
+            verbose=verbose if verbose is not None else self.verbose,
+            llm=self.openai_gpt4o
+        )
 
     def subject_expert_agent(self, verbose: bool = None) -> Agent:
         return Agent(

@@ -83,6 +83,55 @@ class MediumTasks:
             context=blog_tasks,
             callback=self.__task_callback
         )
+        
+    def convert_to_markdown(self, agent: Agent, blog_tasks: list[Task]) -> Task:
+        return Task(
+            description=dedent(
+                f"""
+                Task: Convert the medium blog article to markdown format.
+                Description: Study the given blog article. If it already in markdown format, check for syntaxes.
+                If you found some mistakes only correct them. If no mistakes, do nothing. Convert the blog post
+                to markdown format. If it is not in markdown format, convert it to markdown format using suitable
+                styles. After formatting, the blog should be easily readable. use appropriate gaps, spacing between
+                paragraphs. Use headings, lists for suitable places. DON'T INCLUDE THE FINAL CONTENT WITHIN TRIPLE
+                BACKTICKS. Just give the markdown formatted content ready to render. DO NOT CHANGE ANY OF THE CONTENT.
+                Output should be the blog article in markdown format. Study following example Your output should be
+                like correct one. After format, remove first and last triple backticks.
+                Example:
+                    Incorrect:
+                        ```markdown
+                        # Title
+                        ## Subtitle
+                        Other connet...
+                        ```
+                    Correct:
+                        # Title
+                        ## Subtitle
+                        Other content...
+                Notes: {self.__tip_section()}
+                """
+            ),
+            expected_output="Readable blog article in markdown format.",
+            agent=agent,
+            context=blog_tasks,
+            callback=self.__task_callback
+        )
+
+    def seo_title_generate(self, agent: Agent, blog: str)-> Task:
+        return Task(
+            description=dedent(
+                f"""
+                Task: Generate SEO friendly title for the medium blog article.
+                Description: Study the given blog article. Generate an SEO friendly title for the blog post.
+                The title should be in the range of 40-50 characters. It should be more relevant to the content of the blog.
+                Parameters (parameter values are delimited in triple backticks):
+                    - Blog (in markdown format): ```{blog}```
+                """
+            ),
+            expected_output="40-50 characters long SEO friendly title for the blog post.",
+            agent=agent,
+            callback=self.__task_callback
+        )
 
     def analyze_for_subject_area(self, agent: Agent, blog: str) -> Task:
         return Task(
@@ -120,35 +169,4 @@ class MediumTasks:
             callback=self.__task_callback
         )
 
-    def convert_to_markdown(self, agent: Agent, blog_tasks: list[Task]) -> Task:
-        return Task(
-            description=dedent(
-                f"""
-                Task: Convert the medium blog article to markdown format.
-                Description: Study the given blog article. If it already in markdown format, check for syntaxes.
-                If you found some mistakes only correct them. If no mistakes, do nothing. Convert the blog post
-                to markdown format. If it is not in markdown format, convert it to markdown format using suitable
-                styles. After formatting, the blog should be easily readable. use appropriate gaps, spacing between
-                paragraphs. Use headings, lists for suitable places. DON'T INCLUDE THE FINAL CONTENT WITHIN TRIPLE
-                BACKTICKS. Just give the markdown formatted content ready to render. DO NOT CHANGE ANY OF THE CONTENT.
-                Output should be the blog article in markdown format. Study following example Your output should be
-                like correct one. After format, remove first and last triple backticks.
-                Example:
-                    Incorrect:
-                        ```markdown
-                        # Title
-                        ## Subtitle
-                        Other connet...
-                        ```
-                    Correct:
-                        # Title
-                        ## Subtitle
-                        Other content...
-                Notes: {self.__tip_section()}
-                """
-            ),
-            expected_output="Readable blog article in markdown format.",
-            agent=agent,
-            context=blog_tasks,
-            callback=self.__task_callback
-        )
+    

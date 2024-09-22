@@ -36,19 +36,26 @@ class BlogCrew:
             self.agents.markdown_converter_agent(),
             [check_grammar_and_spellings]
         )
+        
+        seo_title_generation = self.tasks.seo_title_generate(
+            self.agents.seo_specialist_agent(),
+            [markdown_conversion]
+        )
 
         crew = Crew(
             agents=[
                 self.agents.introduction_writer_agent(),
                 self.agents.conclusion_writer_agent(),
                 self.agents.grammar_checker_agent(),
-                self.agents.markdown_converter_agent()
+                self.agents.markdown_converter_agent(),
+                self.agents.seo_specialist_agent()
             ],
             tasks=[
                 prepare_introduction,
                 prepare_conclusion,
                 check_grammar_and_spellings,
-                markdown_conversion
+                markdown_conversion,
+                seo_title_generation
             ],
             verbose=self.verbose,
             # manager_llm=self.agents.openai_gpt4o,
