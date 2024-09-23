@@ -117,20 +117,20 @@ class MediumTasks:
             callback=self.__task_callback
         )
 
-    def seo_title_generate(self, agent: Agent, blog: str)-> Task:
+    def seo_title_generate(self, agent: Agent, blog_task: list[Task]) -> Task:
         return Task(
             description=dedent(
                 f"""
                 Task: Generate SEO friendly title for the medium blog article.
                 Description: Study the given blog article. Generate an SEO friendly title for the blog post.
-                The title should be in the range of 40-50 characters. It should be more relevant to the content of the blog.
-                Parameters (parameter values are delimited in triple backticks):
-                    - Blog (in markdown format): ```{blog}```
+                The title should be in the range of 40-50 characters. It should be more relevant to the content of
+                the blog. After format, remove first and last triple backticks.
                 """
             ),
-            expected_output="40-50 characters long SEO friendly title for the blog post.",
+            expected_output="Markdown formatted blog post and the 40-50 characters long SEO friendly title.",
             agent=agent,
-            callback=self.__task_callback
+            callback=self.__task_callback,
+            context=blog_task
         )
 
     def analyze_for_subject_area(self, agent: Agent, blog: str) -> Task:

@@ -1,19 +1,15 @@
 from crewai import Crew, Process
-from dotenv import load_dotenv
-
 from agents import MediumAgents
 from tasks import MediumTasks
-
-
-load_dotenv()
 
 
 class BlogCrew:
     def __init__(self, blog: str):
         self.blog = blog
-        self.verbose = True
+        self.verbose = False
         self.agents = MediumAgents(verbose=self.verbose)
         self.tasks = MediumTasks()
+        self.max_rpm = 3
 
     def run(self):
 
@@ -36,7 +32,7 @@ class BlogCrew:
             self.agents.markdown_converter_agent(),
             [check_grammar_and_spellings]
         )
-        
+
         seo_title_generation = self.tasks.seo_title_generate(
             self.agents.seo_specialist_agent(),
             [markdown_conversion]
@@ -60,7 +56,8 @@ class BlogCrew:
             verbose=self.verbose,
             # manager_llm=self.agents.openai_gpt4o,
             manager_agent=self.agents.expert_project_manager_agent(),
-            process=Process.hierarchical
+            process=Process.hierarchical,
+            max_rpm=self.max_rpm
         )
 
         result = crew.kickoff()
