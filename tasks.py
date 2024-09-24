@@ -34,7 +34,7 @@ class MediumTasks:
                 Notes: {self.__tip_section()}
                 """
             ),
-            expected_output="Blog article with improved introduction in markdown format.",
+            expected_output="Blog article with improved one paragraph introduction in markdown format.",
             agent=agent,
             callback=self.callback,
             name="Prepare Introduction"
