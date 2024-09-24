@@ -1,57 +1,96 @@
 import streamlit as st
-from textwrap import dedent
 from dotenv import load_dotenv
 from crew import BlogCrew
+from tasks import MediumTasks
 from utils.file_reader import read_blog_from_file
 import agentops
-import litellm
 import os
+from crewai.tasks import TaskOutput
 
-# Load environment variables
 load_dotenv()
 
-# Initialize AgentOps and LiteLLM
 agentops.init(os.environ.get("AGENTOPS_API_KEY"))
-litellm.set_verbose = True
+
+
+def create_task_callback(steps_container, steps_list):
+    def task_callback(output: TaskOutput):
+        task_name = output.name
+        print(f"Task Name : {task_name}")
+
+        # Update the steps in the list
+        for i, step in enumerate(steps_list):
+            if step.startswith(f"- {task_name}:"):
+                steps_list[i] = f"- {task_name}: <span style='color:green'>✅ Completed</span>"
+                break
+
+        # Render the updated steps in the container
+        steps_container.markdown("\n".join(steps_list), unsafe_allow_html=True)
+        print("\n\nTask Completed")
+        print(f"Task: {output.description}")
+        print(f"Context: {output.raw}\n\n")
+
+    return task_callback
+
 
 def main():
-    st.set_page_config(page_title="Blog Crew", page_icon="📝")
+    st.set_page_config(page_title="Blog Crew", page_icon="📝", layout="wide")
 
-    st.title("Welcome to Blog Crew")
+    st.title("Welcome to Medium Blog Assistant 🚀")
     st.markdown("---")
 
-    # Input for blog URL
-    blog_url = st.text_input(
-        "Enter the URL of the Medium blog article you want to improve:",
-        placeholder="https://medium.com/..."
-    )
+    left_column, right_column = st.columns([1, 1])
 
-    if st.button("Improve Blog"):
-        if blog_url:
-            with st.spinner("Improving blog content..."):
-                try:
-                    # Read blog content
-                    blog_content = read_blog_from_file(blog_url)
+    with left_column:
+        blog_url = st.text_input(
+            "Enter the URL of the Medium blog article you want to improve (Member Only blogs are not supported) :",
+            placeholder="https://medium.com/..."
+        )
 
-                    # Create BlogCrew instance and run improvement
-                    blog_crew = BlogCrew(blog_content)
-                    result = blog_crew.run()
+        steps = [
+            "Prepare Introduction",
+            "Prepare Conclusion",
+            "Check Grammar and Spellings",
+            "Convert to Markdown",
+            "Generate SEO Details"
+        ]
 
-                    # Display improved content
-                    st.subheader("Improved Blog Content")
-                    st.markdown(result.raw)
+        steps_list = [f"- {step}: Pending" for step in steps]
 
-                    # Option to download improved content
-                    st.download_button(
-                        label="Download Improved Content",
-                        data=result.raw,
-                        file_name="improved_blog.md",
-                        mime="text/markdown"
-                    )
-                except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
+        steps_container = st.empty()
+
+        if st.button("Improve Blog"):
+            if blog_url:
+                with st.spinner("Improving blog content..."):
+                    try:
+                        blog_content = read_blog_from_file(blog_url)
+
+                        steps_container.markdown("\n".join(steps_list), unsafe_allow_html=True)
+                        custom_callback = create_task_callback(steps_container, steps_list)
+
+                        blog_crew = BlogCrew(blog_content)
+                        blog_crew.tasks = MediumTasks(callback=custom_callback)
+
+                        result = blog_crew.run()
+
+                        st.session_state.improved_content = result.raw
+                        st.download_button(
+                            label="Download Improved Content",
+                            data=result.raw,
+                            file_name="improved_blog.md",
+                            mime="text/markdown"
+                        )
+                    except Exception as e:
+                        st.error(f"An error occurred: {str(e)}")
+            else:
+                st.warning("Please enter a valid blog URL.")
+
+    with right_column:
+        if 'improved_content' in st.session_state:
+            st.subheader("Improved Blog Content")
+            st.markdown(st.session_state.improved_content)
         else:
-            st.warning("Please enter a valid blog URL.")
+            st.info("Improved blog content will appear here after processing.")
+
 
 if __name__ == "__main__":
     main()

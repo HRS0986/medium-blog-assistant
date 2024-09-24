@@ -4,12 +4,8 @@ from crewai.tasks import TaskOutput
 
 
 class MediumTasks:
-
-    @staticmethod
-    def __task_callback(output: TaskOutput):
-        print("\n\nTask Completed")
-        print(f"Task: {output.description}")
-        print(f"Context: {output.raw}\n\n")
+    def __init__(self, callback=None):
+        self.callback = callback
 
     @staticmethod
     def __tip_section() -> str:
@@ -32,6 +28,7 @@ class MediumTasks:
                 introduction, write a proper introduction in creative way. But don't be dramatic. Write a natural one.
                 It should more close to the writing style of the current blog post. Should not change anything not
                 related to introduction. Output should be the blog article with improved introduction.
+                INTRODUCTION SHOULD BE ONE PARAGRAPH.
                 Parameters (parameter values are delimited in triple backticks):
                     - Blog (in markdown format): ```{blog}```
                 Notes: {self.__tip_section()}
@@ -39,11 +36,11 @@ class MediumTasks:
             ),
             expected_output="Blog article with improved introduction in markdown format.",
             agent=agent,
-            async_execution=True,
-            callback=self.__task_callback
+            callback=self.callback,
+            name="Prepare Introduction"
         )
 
-    def prepare_conclusion(self, agent: Agent, blog: str) -> Task:
+    def prepare_conclusion(self, agent: Agent, blog_tasks: list[Task]) -> Task:
         return Task(
             description=dedent(
                 f"""
@@ -56,15 +53,15 @@ class MediumTasks:
                 write a proper conclusion in creative way. But don't be dramatic. Write a natural one. It should more
                 close to the writing style of the current blog post. Should not change anything not related to
                 conclusion. Output should be the blog article with improved conclusion.
-                Parameters (parameter values are delimited in triple backticks):
-                    - Blog (in markdown format): ```{blog}```
+                CONCLUSION SHOULD BE ONE PARAGRAPH.
                 Notes: {self.__tip_section()}
                 """
             ),
             expected_output="Blog article with improved conclusion in markdown format.",
             agent=agent,
-            async_execution=True,
-            callback=self.__task_callback
+            context=blog_tasks,
+            callback=self.callback,
+            name="Prepare Conclusion"
         )
 
     def check_grammar_and_spellings(self, agent: Agent, blog_tasks: list[Task]) -> Task:
@@ -81,9 +78,10 @@ class MediumTasks:
             expected_output="Blog article with corrected grammar and spelling mistakes in markdown format.",
             agent=agent,
             context=blog_tasks,
-            callback=self.__task_callback
+            callback=self.callback,
+            name="Check Grammar and Spellings"
         )
-        
+
     def convert_to_markdown(self, agent: Agent, blog_tasks: list[Task]) -> Task:
         return Task(
             description=dedent(
@@ -114,23 +112,30 @@ class MediumTasks:
             expected_output="Readable blog article in markdown format.",
             agent=agent,
             context=blog_tasks,
-            callback=self.__task_callback
+            callback=self.callback,
+            name="Convert to Markdown"
         )
 
-    def seo_title_generate(self, agent: Agent, blog_task: list[Task]) -> Task:
+    def seo_details_generate(self, agent: Agent, blog_task: list[Task]) -> Task:
         return Task(
             description=dedent(
                 f"""
-                Task: Generate SEO friendly title for the medium blog article.
-                Description: Study the given blog article. Generate an SEO friendly title for the blog post.
-                The title should be in the range of 40-50 characters. It should be more relevant to the content of
-                the blog. After format, remove first and last triple backticks.
+                Task: Generate SEO friendly title and description for the medium blog article.
+                Description: Study the given blog article. Generate an SEO friendly title and a description for the blog
+                post. The title should be in the range of 40-50 characters. It should be more relevant to the content of
+                the blog. If blog already has a title, keep it as. After the ending of the blog,
+                put the SEO title and description.
                 """
             ),
-            expected_output="Markdown formatted blog post and the 40-50 characters long SEO friendly title.",
+            expected_output=dedent(
+                """
+                Blog post, the 40-50 characters long SEO friendly title and 140 - 160 characters long SEO description.
+                """
+            ),
             agent=agent,
-            callback=self.__task_callback,
-            context=blog_task
+            callback=self.callback,
+            context=blog_task,
+            name="Generate SEO Details"
         )
 
     def analyze_for_subject_area(self, agent: Agent, blog: str) -> Task:
@@ -147,7 +152,8 @@ class MediumTasks:
             ),
             expected_output="An string contains subject area or areas of the blog post.",
             agent=agent,
-            callback=self.__task_callback
+            callback=self.callback,
+            name="Analyze for Subject Area"
         )
 
     def check_for_content_accuracy(self, agent: Agent, blog: str, subject: Task) -> Task:
@@ -166,7 +172,6 @@ class MediumTasks:
             expected_output="Blog article with corrected content accuracy in markdown format.",
             agent=agent,
             context=[subject],
-            callback=self.__task_callback
+            callback=self.callback,
+            name="Check for Content Accuracy"
         )
-
-    
