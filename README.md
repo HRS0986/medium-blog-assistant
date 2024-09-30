@@ -17,6 +17,7 @@ AI-powered assistant designed to enhance and optimize Medium blog posts. Leverag
 - **CrewAI**: Orchestrates the collaboration between AI agents.
 - **Streamlit**: Provides an intuitive user interface.
 - **GPT-4o-mini**: Powers the sophisticated language model behind the agents.
+- **AgentOps**: Monitor and manage the agents' activities.
 
 ## 🔧 Installation
 
