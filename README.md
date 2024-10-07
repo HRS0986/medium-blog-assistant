@@ -27,17 +27,10 @@ AI-powered assistant designed to enhance and optimize Medium blog posts. Leverag
     cd medium-blog-assistant
     ```
 
-2. Create a virtual environment and install requirements:
-    - For using pip:
-        ```sh
-        python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
-        ```
-    - For using pipenv:
-        ```sh
-        pipenv install
-        ```
+2. Create a virtual environment and install requirements:    
+    ```sh
+    poetry install
+    ```
 
 ## 🚀 Usage
 

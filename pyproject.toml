@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "medium blog assitant"
+version = "0.1.0"
+description = "AI Agents Based Assistant For Writing Medium Blogs"
+authors = ["Hirusha Fernando <heshanhfernando@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.12.5"
+python-dotenv = "^1.0.1"
+crewai = "^0.67.1"
+crewai-tools = "^0.12.1"
+streamlit = "^1.39.0"
+langtrace-python-sdk = "^2.3.27"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

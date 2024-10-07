@@ -2,15 +2,13 @@ import streamlit as st
 from dotenv import load_dotenv
 from crew import BlogCrew
 from tasks import MediumTasks
-from utils.file_reader import read_blog_from_file
 from utils.markdown_convertor import medium_to_markdown
-import agentops
-import os
+from langtrace_python_sdk import langtrace
 from crewai.tasks import TaskOutput
 
 
 load_dotenv()
-agentops.init(os.environ.get("AGENTOPS_API_KEY"))
+langtrace.init()
 
 
 def create_task_callback(steps_container, steps_list):
